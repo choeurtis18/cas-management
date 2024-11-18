@@ -1,0 +1,64 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String
+  email    String @unique
+  password String
+  role     Role   @default(USER)
+}
+
+model Member {
+  id            Int        @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  creation_date DateTime   @default(now())
+  update_date   DateTime   @updatedAt
+  dues          Dues[] // Toutes les cotisations du menbre
+  categories    Category[] @relation("MemberCategories") // Toutes les catégories auxquelles le menbre appartient
+}
+
+model Category {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String
+  creation_date DateTime @default(now())
+  update_date   DateTime @updatedAt
+  members       Member[] @relation("MemberCategories") // Tous les menbres de cette catégorie
+  dues          Dues[] // Toutes les cotisations de cette catégorie
+}
+
+model Month {
+  id   Int    @id @default(autoincrement())
+  name String // Par exemple, "Janvier", "Février"
+  year Int // Année associée (par exemple, 2024)
+  dues Dues[] // Toutes les cotisations liées à ce mois et cette année
+
+  @@unique([name, year]) // Garantir que le mois et l'année soient uniques
+}
+
+model Dues {
+  id         Int      @id @default(autoincrement())
+  amount     Float // Montant de la cotisation
+  isLate     Boolean  @default(false) // Retard de paiement ou non
+  memberId   Int
+  categoryId Int
+  monthId    Int
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade) // Relation vers Member
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade) // Relation vers Category
+  month      Month    @relation(fields: [monthId], references: [id], onDelete: Cascade) // Relation vers Month
+}
