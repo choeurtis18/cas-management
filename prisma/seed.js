@@ -4,6 +4,7 @@ import prisma from "../lib/prisma.js";
 import { createMember } from "./seed/members.js";
 import { createMonths } from "./seed/months.js";
 import { createCategorie } from "./seed/categories.js";
+import { createUser } from "./seed/user.js";
 
 async function main() {
   try {
@@ -12,6 +13,10 @@ async function main() {
 
     /* Création des données */
     /*
+
+    // Création d'un utilisateur
+    await createUser();
+
     // Création des catégories
     await createCategorie(5);
 
