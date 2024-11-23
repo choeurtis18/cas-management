@@ -1,7 +1,7 @@
 "prisma/seed/members.js"
 
 import { faker } from "@faker-js/faker";
-import prisma from "../../lib/prisma.js";
+import prisma from "@/lib/prisma.js";
 
 export async function createMember(max) {
   for (let i = 0; i < max; i++) {

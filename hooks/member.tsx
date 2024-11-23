@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Member } from '../types';
+import { Member } from '@/types';
 
 // Hook pour récupérer tous les membres
 export const useGetMembers = () => {

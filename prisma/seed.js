@@ -1,6 +1,6 @@
 "prisma/seed.js"
 
-import prisma from "../lib/prisma.js";
+import prisma from "@/lib/prisma.js";
 import { createMember } from "./seed/members.js";
 import { createMonths } from "./seed/months.js";
 import { createCategorie } from "./seed/categories.js";

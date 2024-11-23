@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dues } from '../types';
+import { Dues } from '@/types';
 
 // Hook pour récupérer toutes les cotisations
 export const useGetDues = () => {

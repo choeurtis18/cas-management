@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Month } from '../types';
+import { Month } from '@/types';
 
 // Hook pour récupérer tous les mois
 export const useGetMonths = () => {

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { faker } from "@faker-js/faker";
 
-import prisma from "../../lib/prisma.js";
+import prisma from "@/lib/prisma.js";
 
 export async function  createUser() {
     const hashedPassword = bcrypt.hashSync("password.cas.code", 10); // 10 est le nombre de tours pour le hachage

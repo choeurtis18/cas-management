@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Category } from '../types';
+import { Category } from '@/types';
 
 // Hook pour récupérer toutes les catégories
 export const useGetCategories = () => {

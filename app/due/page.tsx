@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Month, Member } from "../../types";
+import { Month, Member } from "@/types";
 import Link from "next/link";
 
 import { useGetMembers, useUpdateMember } from "@/hooks/member";
@@ -130,7 +130,7 @@ export default function DueList() {
                   e.target.value === "" ? "" : parseInt(e.target.value)
                 )
               }
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option value="">Sélectionner une année</option>
               {years.map((year) => (
@@ -143,7 +143,7 @@ export default function DueList() {
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option value="">Sélectionner un mois</option>
               {months.map((month) => (
@@ -220,7 +220,7 @@ export default function DueList() {
                                     category.id
                                   )
                                 }
-                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               />
                             </td>
                           ))}

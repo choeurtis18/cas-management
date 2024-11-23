@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import { Category, Month } from "../../types";
+import { Category, Month } from "@/types";
 import Link from "next/link";
 import SearchInput from "@/components/SearchInput";
 
