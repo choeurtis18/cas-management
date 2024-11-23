@@ -8,7 +8,7 @@ from '@heroicons/react/24/outline'
 
 {/* Navigation */}
 const navigation = [
-  { name: "Dashboard", href: "/", icon: HomeIcon },
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   { name: "Tontines", href: "/category", icon: FolderIcon },
   { name: "Membres", href: "/member", icon: UsersIcon },
   { name: "Cotisations", href: "/due", icon: ChartPieIcon },

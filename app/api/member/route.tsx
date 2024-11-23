@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
-
+import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     try {
         const members = await prisma.member.findMany({
             include: {
@@ -17,20 +16,20 @@ export async function GET(request: Request) {
         }
 
         console.log("GET API/members: members found:", members);
-        return new Response(JSON.stringify(members));
+        return NextResponse.json(members);
     } catch (error) {
         console.error("Error in API/members:", error);
-        return new Response(JSON.stringify({ error: 'Failed to fetch members' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const body = await request.json();
     
     try {
         if (!body.firstName || !body.lastName) {
             console.error("Missing required fields");
-            return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
         
         const member = await prisma.member.create({
@@ -47,13 +46,13 @@ export async function POST(request: Request) {
         const categories = await prisma.category.findMany();
         if (categories.length === 0 || !categories) {
           console.log("Pas de catégories trouvées. Ajoutez des catégories avant de créer des menbres.");
-          return;
+          return NextResponse.json({ error: 'No categories found' }, { status: 400 });
         }
       
         const months = await prisma.month.findMany();
         if (months.length === 0 || !months) {
           console.log("Pas de mois trouvés. Ajoutez des mois avant de créer des menbres.");
-          return;
+          return NextResponse.json({ error: 'No months found' }, { status: 400 });
         }
       
         for (const month of months) {
@@ -71,14 +70,9 @@ export async function POST(request: Request) {
           }
         }
 
-        return new Response(JSON.stringify(member), {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            status: 201
-        });
+        return NextResponse.json(member, { status: 201 });
     } catch (error) {
         console.error("Error in API/members:", error);
-        return new Response(JSON.stringify({ error: 'Failed to create member' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to create member' }, { status: 500 });
     }
 }

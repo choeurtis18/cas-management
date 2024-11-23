@@ -27,7 +27,7 @@ export default function SignIn() {
         return;
       }
 
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       setError("Une erreur est survenue. Veuillez réessayer.");
     }

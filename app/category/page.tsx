@@ -52,7 +52,7 @@ export default function CategoryList() {
 
     {/* Calcule le montant total des cotisations d'une catégorie pour un mois donné */}
     const getCategoryDuesAmount = (category: Category, month : Month) => {
-        var total = 0;
+        let total = 0;
         category.dues.forEach(due => {
             if (due.monthId === month.id) {
                 total += due.amount;

@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
-
+import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     try {
         const months = await prisma.month.findMany({
             include: {
@@ -16,20 +15,20 @@ export async function GET(request: Request) {
         }
 
         console.log("GET API/month: months found:", months);
-        return new Response(JSON.stringify(months));
+        return NextResponse.json(months);
     } catch (error) {
         console.error("Error in API/month:", error);
-        return new Response(JSON.stringify({ error: 'Failed to fetch months' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch months' }, { status: 500 });
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const body = await request.json();
     
     try {
         if (!body.name || !body.year) {
             console.error("Missing required fields");
-            return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
         
         const month = await prisma.month.create({
@@ -68,14 +67,9 @@ export async function POST(request: Request) {
           }
         }
 
-        return new Response(JSON.stringify(month), {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            status: 201
-        });
+        return NextResponse.json(month, { status: 201 });
     } catch (error) {
         console.error("Error in API/month:", error);
-        return new Response(JSON.stringify({ error: 'Failed to create month' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to create month' }, { status: 500 });
     }
 }

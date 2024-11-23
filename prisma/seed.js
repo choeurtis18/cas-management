@@ -1,6 +1,6 @@
 "prisma/seed.js"
 
-import prisma from "@/lib/prisma.js";
+import prisma from "../lib/prisma.js";
 import { createMember } from "./seed/members.js";
 import { createMonths } from "./seed/months.js";
 import { createCategorie } from "./seed/categories.js";
@@ -12,7 +12,6 @@ async function main() {
     console.log("Connecté à la base de données.");
 
     /* Création des données */
-    /*
 
     // Création d'un utilisateur
     await createUser();
@@ -65,7 +64,6 @@ async function main() {
     } else {
       console.log("Impossible de créer une cotisation : données manquantes.");
     }
-  */
   
   } catch (e) {
     console.error("Erreur lors de la création des données :", e);

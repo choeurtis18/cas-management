@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
 import prisma from '@/lib/prisma';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     try {
         const dues = await prisma.dues.findMany({
             include: {
@@ -18,21 +18,21 @@ export async function GET(request: Request) {
         }
 
         console.log("GET API/due: dues found:", dues);
-        return new Response(JSON.stringify(dues));
+        return NextResponse.json(dues);
     } catch (error) {
         console.error("Error in API/due:", error);
-        return new Response(JSON.stringify({ error: 'Failed to fetch dues' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch dues' }, { status: 500 });
     }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
     const body = await request.json();
     
     try {
         
         if (!body.amount || !body.isLate || !body.memberId || !body.categoryId || !body.monthId) {
             console.error("Missing required fields");
-            return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
+            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
         
         const due = await prisma.dues.create({
@@ -47,14 +47,9 @@ export async function POST(request: Request) {
 
         console.log("POST API/due: due created:", due);
 
-        return new Response(JSON.stringify(due), {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            status: 201
-        });
+        return NextResponse.json(due, { status: 201 });
     } catch (error) {
         console.error("Error in API/due:", error);
-        return new Response(JSON.stringify({ error: 'Failed to create due' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to create due' }, { status: 500 });
     }
 }
