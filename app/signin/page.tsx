@@ -29,7 +29,7 @@ export default function SignIn() {
 
       router.push("/dashboard");
     } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      setError("Une erreur est survenue. Veuillez réessayer. "+err);
     }
   };
 

@@ -18,18 +18,6 @@ export default function UpdateMember({
     const { member, loading: loadingMember, error: errorMember } = useGetMember(memberId);
     const { updateMember, loading: loadingUpdate, error: errorUpdate } = useUpdateMember();
 
-    if (loadingMember) {
-        return <div className="pt-8 pb-16 px-4 bg-white antialiased">Chargement...</div>;
-    }
-
-    if (errorMember) {
-        return (
-        <div className="pt-8 pb-16 px-4 bg-white antialiased text-red-600">
-            {errorMember}
-        </div>
-        );
-    }
-
     {/* Fetch les informations du membre */}
     useEffect(() => {
         if(member) {
@@ -39,6 +27,18 @@ export default function UpdateMember({
             });
         }
     }, [member]);
+
+    if (loadingMember || loadingUpdate) {
+        return <div className="pt-8 pb-16 px-4 bg-white antialiased">Chargement...</div>;
+    }
+
+    if (errorMember || errorUpdate) {
+        return (
+        <div className="pt-8 pb-16 px-4 bg-white antialiased text-red-600">
+            {errorMember}
+        </div>
+        );
+    }
 
     {/* Fonction pour gérer les changements des champs de saisie */}
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

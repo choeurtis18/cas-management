@@ -48,6 +48,7 @@ export default function DueList() {
     }
 
     let month = months.find((m) => m.name === selectedMonth && m.year === selectedYear);
+    console.log("year", years);
 
     if (month) {
       setFilteredMonth(month);
@@ -116,7 +117,7 @@ export default function DueList() {
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="sm:flex-auto">
             <h1 className="text-base font-semibold text-gray-900">Liste des cotisations</h1>
-            <p className="mt-2 text-sm text-gray-700">Voici la liste des cotisations de l'association.</p>
+            <p className="mt-2 text-sm text-gray-700">Voici la liste des cotisations de l association.</p>
           </div>
           <div className="mt-4 flex space-x-4 sm:mt-0">
             <select

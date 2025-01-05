@@ -80,7 +80,7 @@ export default function CategoryList() {
                         <div className="sm:flex-auto">
                         <h1 className="text-base font-semibold text-gray-900">Liste des tontines</h1>
                         <p className="mt-2 text-sm text-gray-700">
-                            Voici la liste tontines de l'association.
+                            Voici la liste tontines de l association.
                         </p>
                         </div>
                         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">

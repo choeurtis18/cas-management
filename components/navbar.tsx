@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Dialog, DialogBackdrop, DialogPanel, TransitionChild } from '@headlessui/react'
 import { Bars3Icon, ChartPieIcon, Cog6ToothIcon, FolderIcon, HomeIcon, UsersIcon, XMarkIcon } 
 from '@heroicons/react/24/outline'
+import Link from 'next/link';
 
 {/* Navigation */}
 const navigation = [
@@ -52,11 +53,7 @@ export default function Navbar() {
             {/* Sidebar component, swap this element with another sidebar if you like */}
             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
               <div className="flex h-16 shrink-0 items-center">
-                <img
-                  alt="Your Company"
-                  src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                  className="h-8 w-auto"
-                />
+                <Link href={'/'} className="text-lg/6 font-semibold text-gray-900">C.A.S APP</Link>
               </div>
               <nav className="flex flex-1 flex-col">
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -110,11 +107,7 @@ export default function Navbar() {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
-            <img
-              alt="Your Company"
-              src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-              className="h-8 w-auto"
-            />
+          <Link href={"/"} className="text-lg/6 font-semibold text-gray-900">C.A.S APP</Link>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -176,7 +169,7 @@ export default function Navbar() {
           {/* Separator */}
           <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
           
-          <p className="text-lg/6 font-semibold text-gray-900">C.A.S APP</p>
+          <Link href={"/"} className="text-lg/6 font-semibold text-gray-900">C.A.S APP</Link>
         </div>
       </div>
     </>
