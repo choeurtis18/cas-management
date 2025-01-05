@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
-import { Member, Month, Category } from "@/types";
+import { Member } from "@/types";
 import SearchInput from "@/components/SearchInput";
 
 import { useGetCategory } from "@/hooks/category";
@@ -37,7 +37,13 @@ export default function CategoryDetails({
   }, [searchQuery, members]);
 
   // Mois filtrés par année sélectionnée
-  const filteredMonths = months.filter((month) => month.year === selectedYear);
+  const monthOrder = ["Janvier", "Février", "Mars", "Avril", "Mai",
+    "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+
+  // Filtrer les mois en fonction de l'année sélectionnée
+  const filteredMonths = months
+      .filter((month) => month.year === selectedYear)
+      .sort((a, b) => monthOrder.indexOf(a.name) - monthOrder.indexOf(b.name));
 
   /**
    * Formate une date en une chaîne lisible.
@@ -143,23 +149,25 @@ export default function CategoryDetails({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {filteredMembers.map((member) => (
+                      {filteredMembers.map((member) => {
+                      return (
                         <tr key={`member-${member.id}`}>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            <Link href={`/member/${member.id}`}>
-                              {member.firstName} {member.lastName}
-                            </Link>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                          <Link href={`/member/${member.id}`}>
+                          {member.firstName} {member.lastName}
+                          </Link>
+                        </td>
+                        {filteredMonths.map((month) => (
+                          <td
+                          key={`category-${category.id}-month-${month.id}`}
+                          className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+                          >
+                          {member.dues.find((due) => due.monthId === month.id)?.amount || "0"} €
                           </td>
-                          {filteredMonths.map((month) => (
-                            <td
-                              key={`category-${category.id}-month-${month.id}`}
-                              className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
-                            >
-                              {member.dues.find((due) => due.monthId === month.id)?.amount || "0"} €
-                            </td>
-                          ))}
+                        ))}
                         </tr>
-                      ))}
+                      );
+                      })}
                     </tbody>
                   </table>
                 </div>

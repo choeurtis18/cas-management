@@ -35,8 +35,14 @@ export default function MemberDetails({
         );
     }
 
-    // Filtre les mois en fonction de l'année sélectionnée
-    const filteredMonths = months.filter((month) => month.year === selectedYear);
+    // Mois filtrés par année sélectionnée
+    const monthOrder = ["Janvier", "Février", "Mars", "Avril", "Mai",
+        "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+
+    // Filtrer les mois en fonction de l'année sélectionnée
+    const filteredMonths = months
+        .filter((month) => month.year === selectedYear)
+        .sort((a, b) => monthOrder.indexOf(a.name) - monthOrder.indexOf(b.name));
 
     /**
      * Formate une date en une chaîne lisible du type "Samedi 12 janvier 2022 - 12h00".

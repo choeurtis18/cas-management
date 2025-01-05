@@ -40,8 +40,15 @@ export default function CategoryList() {
         );
     }
 
-    {/* Filtre les mois en fonction de l'année sélectionnée */}
-    const filteredMonths = months.filter((month) => month.year === selectedYear);
+    // Tableau pour définir l'ordre des mois
+    const monthOrder = ["Janvier", "Février", "Mars", "Avril", "Mai",
+    "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  
+    // Filtrer les mois en fonction de l'année sélectionnée
+    const filteredMonths = months
+        .filter((month) => month.year === selectedYear)
+        .sort((a, b) => monthOrder.indexOf(a.name) - monthOrder.indexOf(b.name));
+  
 
     {/* Supprime une catégorie */}
     const handleDelete = (id: number) => async () => {
@@ -154,6 +161,19 @@ export default function CategoryList() {
                                 </td>
                                 </tr>
                             ))}
+                            <tr>
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-6">
+                                    Total
+                                </td>
+                                {filteredMonths.map((month) => (
+                                    <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-semibold sm:pr-6" key={"total-"+month.id}>
+                                        {filteredCategories.reduce((total, category) => total + getCategoryDuesAmount(category, month), 0)} €
+                                    </td>
+                                ))}
+                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                    {/* Empty cell for alignment */}
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                         </div>

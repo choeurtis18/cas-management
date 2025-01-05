@@ -5,20 +5,24 @@ import { Month, Member } from "@/types";
 import Link from "next/link";
 
 import { useGetMembers, useUpdateMember } from "@/hooks/member";
-import { useGetMonths } from "@/hooks/month";
+import { useGetMonths, useAddMonth } from "@/hooks/month";
 import { useGetCategories } from "@/hooks/category";
 
 export default function DueList() {
   const { members, loading: loadingMembers, error: errorMembers } = useGetMembers();
-  const { months, years, loading: loadingMonths, error: errorMonths } = useGetMonths();
+  const { months, years, loading: loadingMonths, error: errorMonths, refetch: refetchMonths } = useGetMonths();
   const { categories, loading: loadingCategories, error: errorCategories } = useGetCategories();
   const { updateMember } = useUpdateMember();
+  const { addMonth } = useAddMonth();
 
-  const [filteredMembers, setFilteredMembers] = useState<Member[]>([]); // Liste des membres filtrés
-  const [filteredMonth, setFilteredMonth] = useState<Month | null>(null); // Mois filtré
-  const [selectedMonth, setSelectedMonth] = useState<string>(""); // Mois sélectionné
-  const [selectedYear, setSelectedYear] = useState<number | "">(""); // Année sélectionnée
-  const [errorMessage, setErrorMessage] = useState<string>(""); // Message d'erreur
+  const yearsChoices = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"];
+  const monthsChoices = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+
+  const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
+  const [filteredMonth, setFilteredMonth] = useState<Month | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<number | "">("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Initialiser les membres filtrés
   useEffect(() => {
@@ -37,53 +41,54 @@ export default function DueList() {
     );
   }
 
-  /* Recherche du mois sélectionné */
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!selectedMonth || !selectedYear) {
       setErrorMessage("Veuillez sélectionner un mois et une année.");
       return;
     }
 
-    const month = months.find(
-      (m) => m.name === selectedMonth && m.year === selectedYear
-    );
+    let month = months.find((m) => m.name === selectedMonth && m.year === selectedYear);
 
     if (month) {
       setFilteredMonth(month);
       setErrorMessage("");
     } else {
-      setErrorMessage("Aucun mois trouvé pour cette sélection.");
+      try {
+        const newMonth = await addMonth({ name: selectedMonth, year: selectedYear });
+        const updatedMonths = await refetchMonths();
+        month = updatedMonths.find((m) => m.name === newMonth.name && m.year === newMonth.year);
+
+        if (month) {
+          setFilteredMonth(month);
+          setErrorMessage("");
+        } else {
+          setErrorMessage("Le mois a été ajouté mais ne peut pas être trouvé.");
+        }
+      } catch (error) {
+        setErrorMessage("Erreur lors de l'ajout du mois.");
+        console.error(error);
+      }
     }
   };
 
-  /* Mettre à jour la cotisation d'un membre */
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    memberId: number,
-    categoryId: number
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, memberId: number, categoryId: number) => {
     const { value } = e.target;
-
     setFilteredMembers((prevMembers) =>
-      prevMembers.map((member) => {
-        if (member.id === memberId) {
-          const updatedDues = member.dues.map((due) => {
-            if (
-              due.categoryId === categoryId &&
-              due.monthId === filteredMonth?.id
-            ) {
-              return { ...due, amount: parseFloat(value) || 0 };
+      prevMembers.map((member) =>
+        member.id === memberId
+          ? {
+              ...member,
+              dues: member.dues.map((due) =>
+                due.categoryId === categoryId && due.monthId === filteredMonth?.id
+                  ? { ...due, amount: parseFloat(value) || 0 }
+                  : due
+              ),
             }
-            return due;
-          });
-          return { ...member, dues: updatedDues };
-        }
-        return member;
-      })
+          : member
+      )
     );
   };
 
-  /* Soumettre les mises à jour des cotisations */
   const handleSubmit = async () => {
     if (!filteredMonth) {
       alert("Veuillez sélectionner un mois avant de soumettre.");
@@ -96,14 +101,11 @@ export default function DueList() {
         dues: member.dues.filter((due) => due.monthId === filteredMonth.id),
       }));
 
-      await Promise.all(
-        updates.map((update) => updateMember(update.id, { dues: update.dues }))
-      );
-
+      await Promise.all(updates.map((update) => updateMember(update.id, { dues: update.dues })));
       alert("Cotisations mises à jour avec succès !");
-    } catch (err) {
-      console.error("Erreur lors de la mise à jour :", err);
+    } catch (error) {
       setErrorMessage("Erreur lors de la mise à jour des cotisations.");
+      console.error(error);
     }
   };
 
@@ -113,60 +115,48 @@ export default function DueList() {
         {/* Header */}
         <div className="sm:flex sm:items-center sm:justify-between">
           <div className="sm:flex-auto">
-            <h1 className="text-base font-semibold text-gray-900">
-              Liste des cotisations
-            </h1>
-            <p className="mt-2 text-sm text-gray-700">
-              Voici la liste des cotisations de l'association.
-            </p>
+            <h1 className="text-base font-semibold text-gray-900">Liste des cotisations</h1>
+            <p className="mt-2 text-sm text-gray-700">Voici la liste des cotisations de l'association.</p>
           </div>
-
-          {/* Sélection du mois et de l'année */}
           <div className="mt-4 flex space-x-4 sm:mt-0">
             <select
               value={selectedYear}
-              onChange={(e) =>
-                setSelectedYear(
-                  e.target.value === "" ? "" : parseInt(e.target.value)
-                )
-              }
+              onChange={(e) => setSelectedYear(e.target.value === "" ? "" : parseInt(e.target.value))}
               className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option value="">Sélectionner une année</option>
-              {years.map((year) => (
-                <option key={`year-${year}`} value={year}>
+              {yearsChoices.map((year) => (
+                <option key={year} value={year}>
                   {year}
                 </option>
               ))}
             </select>
-
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option value="">Sélectionner un mois</option>
-              {months.map((month) => (
-                <option key={`month-${month.id}`} value={month.name}>
-                  {month.name}
+              {monthsChoices.map((month) => (
+                <option key={month} value={month}>
+                  {month}
                 </option>
               ))}
             </select>
-
             <button
               onClick={handleSearch}
-              className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
             >
               Chercher
             </button>
           </div>
         </div>
 
-        {/* Erreur */}
+        {/* Error */}
         {errorMessage && <div className="mt-4 text-red-600">{errorMessage}</div>}
 
-        {/* Tableau des cotisations */}
-        {filteredMonth && members.length > 0 && categories.length > 0 && (
+        {/* Table */}
+        {filteredMonth && (
           <div className="mt-8 flow-root">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -174,18 +164,9 @@ export default function DueList() {
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th
-                          scope="col"
-                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          Nom
-                        </th>
+                        <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Nom</th>
                         {categories.map((category) => (
-                          <th
-                            scope="col"
-                            className="px-3 py-3 text-left text-sm font-semibold text-gray-900"
-                            key={`category-${category.id}`}
-                          >
+                          <th key={category.id} className="px-3 py-3 text-left text-sm font-semibold text-gray-900">
                             {category.name}
                           </th>
                         ))}
@@ -193,33 +174,23 @@ export default function DueList() {
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
                       {filteredMembers.map((member) => (
-                        <tr key={`member-${member.id}`}>
+                        <tr key={member.id}>
                           <td className="pl-4 pr-3 py-2 text-sm text-gray-900 sm:pl-6">
                             <Link href={`/member/${member.id}`}>
                               {member.firstName} {member.lastName}
                             </Link>
                           </td>
                           {categories.map((category) => (
-                            <td
-                              className="pl-3 pr-4 py-2 text-sm text-gray-900 sm:pr-6"
-                              key={`category-${category.id}`}
-                            >
+                            <td key={category.id} className="px-3 py-2">
                               <input
                                 type="number"
                                 value={
                                   member.dues.find(
                                     (due) =>
-                                      due.categoryId === category.id &&
-                                      due.monthId === filteredMonth.id
+                                      due.categoryId === category.id && due.monthId === filteredMonth.id
                                   )?.amount || 0
                                 }
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    e,
-                                    member.id,
-                                    category.id
-                                  )
-                                }
+                                onChange={(e) => handleInputChange(e, member.id, category.id)}
                                 className="block w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                               />
                             </td>
@@ -232,10 +203,10 @@ export default function DueList() {
               </div>
             </div>
 
-            {/* Bouton de mise à jour */}
+            {/* Submit */}
             <button
               onClick={handleSubmit}
-              className="mt-4 block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="mt-4 inline-block rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
             >
               Mettre à jour les cotisations
             </button>

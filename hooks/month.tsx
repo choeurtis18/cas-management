@@ -7,44 +7,31 @@ export const useGetMonths = () => {
     const [years, setYears] = useState<number[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
+  
+    const fetchMonths = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/month");
+        if (!response.ok) throw new Error("Failed to fetch months");
+        const data: Month[] = await response.json();
+        const sortedMonths = data.sort((a, b) => a.year - b.year);
+        setMonths(sortedMonths);
+        setYears(Array.from(new Set(data.map((m) => m.year))));
+        return sortedMonths;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    };
+  
     useEffect(() => {
-        const fetchMonths = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/api/month');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch months');
-                }
-                const data: Month[] = await response.json();
-
-                // Trie les mois par ordre chronologique
-                const sortedMonths = data.sort((a: Month, b: Month) => {
-                    const monthOrder = [ "Janvier", "Février", "Mars", "Avril",  "Mai", "Juin",  "Juillet", 
-                    "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
-                    return ( monthOrder.indexOf(a.name) - monthOrder.indexOf(b.name) || a.year - b.year );
-                });
-
-                setMonths(sortedMonths);
-
-                // Extrait toutes les années uniques
-                const uniqueYears = Array.from(new Set(data.map((month: Month) => month.year))) as number[];
-                setYears(uniqueYears.sort((a, b) => a - b));
-            } catch (err) {
-                if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError('An unknown error occurred');
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchMonths();
+      fetchMonths();
     }, []);
-
-    return { months, years, loading, error };
-};
+  
+    return { months, years, loading, error, refetch: fetchMonths };
+  };
 
 // Hook pour récupérer un mois spécifique par ID
 export const useGetMonth = (id: number) => {
@@ -82,33 +69,28 @@ export const useGetMonth = (id: number) => {
 export const useAddMonth = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
+  
     const addMonth = async (month: Partial<Month>) => {
-        setLoading(true);
-        try {
-            const response = await fetch('http://localhost:3000/api/month', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(month),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to add month');
-            }
-        } catch (err) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError('An unknown error occurred');
-            }
-        } finally {
-            setLoading(false);
-        }
+      setLoading(true);
+      try {
+        const response = await fetch("/api/month", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(month),
+        });
+        if (!response.ok) throw new Error("Failed to add month");
+        return await response.json();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
     };
-
+  
     return { addMonth, loading, error };
-};
+  };
+  
 
 // Hook pour mettre à jour un mois
 export const useUpdateMonth = () => {
